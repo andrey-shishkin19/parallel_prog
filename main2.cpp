@@ -158,14 +158,14 @@ int main() {
     size_t n = A.getSize();
     size_t taskSize = 2 * n * n * sizeof(long long) + n * n * sizeof(long long);
     
-    std::cout << "\n=== Информация о задаче ===" << std::endl;
+    std::cout << "Информация о задаче" << std::endl;
     std::cout << "Размер матриц: " << n << "x" << n << std::endl;
     std::cout << "Тип данных: long long (целые числа)" << std::endl;
     std::cout << "Объем входных данных: " << (2 * n * n * sizeof(long long)) / 1024.0 << " KB" << std::endl;
     std::cout << "Объем выходных данных: " << (n * n * sizeof(long long)) / 1024.0 << " KB" << std::endl;
     std::cout << "Общий объем задачи: " << taskSize / 1024.0 << " KB" << std::endl;
     
-    std::cout << "\n=== Параллельные настройки ===" << std::endl;
+    std::cout << "Параллельные настройки" << std::endl;
     std::cout << "Количество потоков: " << num_threads << std::endl;
     std::cout << "Максимально доступно потоков: " << max_threads << std::endl;
     
@@ -193,7 +193,7 @@ int main() {
     double speedup = static_cast<double>(duration_seq.count()) / duration.count();
     double efficiency = speedup / num_threads * 100;
     
-    std::cout << "\n=== Результаты ===" << std::endl;
+    std::cout << std::endl;
     std::cout << "Время выполнения (параллельное, " << num_threads << " потоков): " 
               << duration.count() << " мс" << std::endl;
     std::cout << "Время выполнения (последовательное): " << duration_seq.count() << " мс" << std::endl;
