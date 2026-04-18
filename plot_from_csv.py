@@ -1,10 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Загрузка данных
 df = pd.read_csv('results_parallel.csv')
 
-# Построение графика
 plt.figure(figsize=(10, 6))
 
 for threads in sorted(df['threads'].unique()):
@@ -18,6 +16,5 @@ plt.legend()
 plt.grid(True)
 plt.tight_layout()
 
-# Сохранение и показ
 plt.savefig('time_vs_size.png', dpi=150)
 plt.show()
