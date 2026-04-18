@@ -100,10 +100,8 @@ int main(int argc, char** argv) {
     std::string fileA, fileB, fileResult;
 
     if (rank == 0) {
-        std::cout << "========================================" << std::endl;
         std::cout << "Лабораторная работа №3" << std::endl;
         std::cout << "Параллельное умножение матриц (MPI)" << std::endl;
-        std::cout << "========================================" << std::endl;
         std::cout << "Количество доступных процессов: " << num_processes << std::endl;
         std::cout << std::endl;
 
@@ -196,9 +194,7 @@ int main(int argc, char** argv) {
     }
 
     if (rank == 0) {
-        std::cout << "\n========================================" << std::endl;
         std::cout << "Информация о задаче" << std::endl;
-        std::cout << "========================================" << std::endl;
         std::cout << "Размер матриц: " << n << "x" << n << std::endl;
         std::cout << "Количество процессов: " << num_processes << std::endl;
         std::cout << "Объем данных: " << (2.0 * n * n * sizeof(double)) / (1024.0 * 1024.0) << " MB" << std::endl;
@@ -290,9 +286,8 @@ int main(int argc, char** argv) {
         double speedup = seq_time_ms / mpi_time_ms;
         double efficiency = (speedup / num_processes) * 100.0;
 
-        std::cout << "\n========================================" << std::endl;
-        std::cout << "РЕЗУЛЬТАТЫ" << std::endl;
-        std::cout << "========================================" << std::endl;
+        std::cout << std::endl;
+        std::cout << "Результаты" << std::endl;
         std::cout << "Последовательное время: " << std::fixed << std::setprecision(2) << seq_time_ms << " мс" << std::endl;
         std::cout << "Параллельное время (" << num_processes << " процессов): " << std::fixed << std::setprecision(2) << mpi_time_ms << " мс" << std::endl;
         std::cout << "Ускорение: " << std::fixed << std::setprecision(2) << speedup << "x" << std::endl;
@@ -300,7 +295,7 @@ int main(int argc, char** argv) {
         std::cout << "Результат сохранён в: " << fileResult << std::endl;
 
         // Запись в CSV файл для построения графиков
-        std::ofstream resultsFile("results_for_graph.csv", std::ios::app);
+        std::ofstream resultsFile("results_mpi.csv", std::ios::app);
         if (resultsFile.is_open()) {
             // Проверяем, пустой ли файл
             resultsFile.seekp(0, std::ios::end);
@@ -311,9 +306,7 @@ int main(int argc, char** argv) {
             resultsFile.close();
         }
 
-        // Теперь нам нужно записывать данные для разных процессов
-        // Открываем файл для чтения/записи
-        std::fstream resultsFileRW("results_for_graph.csv", std::ios::in | std::ios::out);
+        std::fstream resultsFileRW("results_mpi.csv", std::ios::in | std::ios::out);
 
         if (resultsFileRW.is_open()) {
             std::vector<std::string> lines;
@@ -377,13 +370,13 @@ int main(int argc, char** argv) {
 
             // Перезаписываем файл
             resultsFileRW.close();
-            std::ofstream outFile("results_for_graph.csv");
+            std::ofstream outFile("results_mpi.csv");
             for (const auto& l : lines) {
                 outFile << l << "\n";
             }
             outFile.close();
 
-            std::cout << "\nДанные добавлены в results_for_graph.csv" << std::endl;
+            std::cout << "\nДанные добавлены в results_mpi.csv" << std::endl;
         }
     }
 
