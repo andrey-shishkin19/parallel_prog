@@ -274,109 +274,32 @@ int main(int argc, char** argv) {
     double mpi_time_ms = (end_time - start_time) * 1000.0;
 
     if (rank == 0) {
-        // Сохраняем результат
         C.writeToFile(fileResult);
 
-        // Последовательное вычисление для сравнения
         auto start_seq = std::chrono::high_resolution_clock::now();
         Matrix C_seq = A.multiply(B);
         auto end_seq = std::chrono::high_resolution_clock::now();
         double seq_time_ms = std::chrono::duration<double, std::milli>(end_seq - start_seq).count();
 
-        double speedup = seq_time_ms / mpi_time_ms;
-        double efficiency = (speedup / num_processes) * 100.0;
-
         std::cout << std::endl;
         std::cout << "Результаты" << std::endl;
         std::cout << "Последовательное время: " << std::fixed << std::setprecision(2) << seq_time_ms << " мс" << std::endl;
         std::cout << "Параллельное время (" << num_processes << " процессов): " << std::fixed << std::setprecision(2) << mpi_time_ms << " мс" << std::endl;
-        std::cout << "Ускорение: " << std::fixed << std::setprecision(2) << speedup << "x" << std::endl;
-        std::cout << "Эффективность: " << std::fixed << std::setprecision(1) << efficiency << "%" << std::endl;
-        std::cout << "Результат сохранён в: " << fileResult << std::endl;
 
-        // Запись в CSV файл для построения графиков
         std::ofstream resultsFile("results_mpi.csv", std::ios::app);
         if (resultsFile.is_open()) {
-            // Проверяем, пустой ли файл
             resultsFile.seekp(0, std::ios::end);
             if (resultsFile.tellp() == 0) {
-                // Заголовок для удобного построения графиков
-                resultsFile << "MatrixSize,Processes_1,Processes_2,Processes_4,Processes_8\n";
+                resultsFile << "MatrixSize,Processes,SequentialTime_ms,ParallelTime_ms\n";
             }
+            resultsFile << n_int << "," << num_processes << ","
+                << std::fixed << std::setprecision(2) << seq_time_ms << ","
+                << std::fixed << std::setprecision(2) << mpi_time_ms << "\n";
             resultsFile.close();
-        }
-
-        std::fstream resultsFileRW("results_mpi.csv", std::ios::in | std::ios::out);
-
-        if (resultsFileRW.is_open()) {
-            std::vector<std::string> lines;
-            std::string line;
-            bool found = false;
-
-            // Читаем все строки
-            while (std::getline(resultsFileRW, line)) {
-                lines.push_back(line);
-            }
-
-            // Ищем строку с нужным размером матрицы
-            std::string target = std::to_string(n_int) + ",";
-            for (auto& l : lines) {
-                if (l.find(target) == 0) {
-                    // Нашли строку, добавляем данные для текущего количества процессов
-                    std::stringstream ss(l);
-                    std::string token;
-                    std::vector<std::string> tokens;
-                    while (std::getline(ss, token, ',')) {
-                        tokens.push_back(token);
-                    }
-
-                    // Определяем индекс для количества процессов
-                    int col_index = -1;
-                    if (num_processes == 1) col_index = 1;
-                    else if (num_processes == 2) col_index = 2;
-                    else if (num_processes == 4) col_index = 3;
-                    else if (num_processes == 8) col_index = 4;
-                    else col_index = 5; // для других значений
-
-                    // Добавляем или обновляем значение
-                    while (tokens.size() <= col_index) {
-                        tokens.push_back("");
-                    }
-                    tokens[col_index] = std::to_string(mpi_time_ms);
-
-                    // Пересобираем строку
-                    l = tokens[0];
-                    for (size_t i = 1; i < tokens.size(); ++i) {
-                        l += "," + tokens[i];
-                    }
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                // Создаем новую строку
-                std::string new_line = std::to_string(n_int);
-                for (int p = 1; p <= 8; p *= 2) {
-                    if (p == num_processes) {
-                        new_line += "," + std::to_string(mpi_time_ms);
-                    }
-                    else {
-                        new_line += ",";
-                    }
-                }
-                lines.push_back(new_line);
-            }
-
-            // Перезаписываем файл
-            resultsFileRW.close();
-            std::ofstream outFile("results_mpi.csv");
-            for (const auto& l : lines) {
-                outFile << l << "\n";
-            }
-            outFile.close();
-
             std::cout << "\nДанные добавлены в results_mpi.csv" << std::endl;
+        }
+        else {
+            std::cerr << "Ошибка: не удалось создать файл results_mpi.csv" << std::endl;
         }
     }
 
